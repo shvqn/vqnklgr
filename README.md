@@ -34,5 +34,5 @@ open vqnklgr.py and dit the lines with comments in the file
 pyarmor pack --clean -e "--onefile --windowed --icon==NONE" vqnklgr.py
 
 #complie startup.py
-pyinstaller --onefile startup.py
+pyinstaller --clean --onefile startup.py
 ```
