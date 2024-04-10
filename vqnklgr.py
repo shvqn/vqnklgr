@@ -69,11 +69,11 @@ def record_and_save_audio(output_folder):
         record_duration = 30  #Duration of each audio recording
         current_time = datetime.now().strftime("%d%m%Y_%H%M%S")
         audio_path = os.path.join(output_folder, f"audio_{current_time}.wav")
-        audio_data = sd.rec(int(record_duration * 44100), samplerate=44100, channels=2, dtype='int16')
+        audio_data = sd.rec(int(record_duration * 22050), samplerate=22050, channels=2, dtype='int16')
         sd.wait()
         rms = np.sqrt(np.mean(audio_data**2))
         if rms > 0.6:   #Increases if the audio file has a lot of environmental noise 
-            sf.write(audio_path, audio_data, 44100, 'PCM_24')
+            sf.write(audio_path, audio_data, 22050, 'PCM_16')
 
 def send_files_email(sender_email, sender_password, receiver_email, files_folder):
     files = [f for f in os.listdir(files_folder) if os.path.isfile(os.path.join(files_folder, f))]
