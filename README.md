@@ -31,7 +31,7 @@ pip3 install -r requirements.txt
 open vqnklgr.py and dit the lines with comments in the file
 
 #pack vqnklgr.py
-pyarmor pack --clean -e "--onefile --windowed --icon==NONE" vqnklgr.py
+pyarmor pack --clean -e "--onefile --windowed --icon=NONE" vqnklgr.py
 
 #complie startup.py
 pyinstaller --clean --onefile startup.py

